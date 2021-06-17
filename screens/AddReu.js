@@ -1,17 +1,18 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+
 import firebase from 'firebase';
-import { StyleSheet,TextInput, Dimensions,ScrollView, ActivityIndicator, View } from 'react-native';
+import React, { Component } from 'react';
+import { Button,StyleSheet,TextInput, Dimensions,ScrollView, ActivityIndicator, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
-export default class FormReu extends React.Component {
+export default class FormReu extends Component {
     constructor() {
         super();
         this.dbRef = firebase.firestore().collection('reunion');
         this.state = {
-          name: '',
-          email: '',
+          nom: '',
+          participant: '',
           mobile: '',
           duree:'',
           salle:'',
@@ -26,30 +27,30 @@ export default class FormReu extends React.Component {
       }
     
       storeReunion() {
-        if(this.state.name === ''){
+        if(this.state.nom === ''){
          alert('Veuillez entrer le nom de la reunion!')
         } else {
           this.setState({
             isLoading: true,
           });      
           this.dbRef.add({
-            name: this.state.name,
-            email: this.state.email,
+            nom: this.state.nom,
+            participant: this.state.participant,
             mobile: this.state.mobile,
             duree: this.state.duree,
             salle: this.state.salle,
             motif: this.state.motif,
           }).then((res) => {
             this.setState({
-              name: '',
-              email: '',
+              nom: '',
+              participant: '',
               mobile: '',
               duree:'',
               salle:'',
               motif:'',
               isLoading: false,
             });
-            this.props.navigation.navigate('ListReu')
+            this.props.navigation.navigate("liste des Reunions")
           })
           .catch((err) => {
             console.error("Error found: ", err);
@@ -73,8 +74,8 @@ export default class FormReu extends React.Component {
           <View style={styles.inputGroup}>
             <TextInput
                 placeholder={'Name'}
-                value={this.state.name}
-                onChangeText={(val) => this.inputValueUpdate(val, 'name')}
+                value={this.state.nom}
+                onChangeText={(val) => this.inputValueUpdate(val, 'nom')}
             />
           </View>
           <View style={styles.inputGroup}>
@@ -82,8 +83,8 @@ export default class FormReu extends React.Component {
                 multiline={true}
                 numberOfLines={4}
                 placeholder={'Email-participant'}
-                value={this.state.email}
-                onChangeText={(val) => this.inputValueUpdate(val, 'email')}
+                value={this.state.participant}
+                onChangeText={(val) => this.inputValueUpdate(val, 'participant')}
             />
           </View>
           <View style={styles.inputGroup}>
@@ -96,21 +97,21 @@ export default class FormReu extends React.Component {
           <View style={styles.inputGroup}>
             <TextInput
                 placeholder={'Durée de la réunion'}
-                value={this.state.mobile}
+                value={this.state.duree}
                 onChangeText={(val) => this.inputValueUpdate(val, 'duree')}
             />
           </View>
           <View style={styles.inputGroup}>
             <TextInput
                 placeholder={'Salle de la réunion'}
-                value={this.state.mobile}
+                value={this.state.salle}
                 onChangeText={(val) => this.inputValueUpdate(val, 'salle')}
             />
           </View>
           <View style={styles.inputGroup}>
             <TextInput
                 placeholder={'Motif de la reunion'}
-                value={this.state.mobile}
+                value={this.state.motif}
                 onChangeText={(val) => this.inputValueUpdate(val, 'motif')}
             />
           </View>
@@ -127,3 +128,29 @@ export default class FormReu extends React.Component {
  }
  
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 35
+  },
+  inputGroup: {
+    flex: 1,
+    padding: 0,
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#cccccc',
+  },
+  preloader: {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  button: {
+    marginBottom: 7, 
+  }
+})

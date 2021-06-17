@@ -1,7 +1,8 @@
 import 'react-native-gesture-handler';
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, View } from 'react-native';
+import { StyleSheet, ActivityIndicator, View } from 'react-native';
 import { ListItem } from 'react-native-elements';
+import { StatusBar } from 'expo-status-bar';
 import { FloatingAction } from "react-native-floating-action";
 import db from '../database/firebaseDb';
 
@@ -15,9 +16,10 @@ const actions = [
     
    ];
 
-export default class ListReu extends React.Component {
-    constructor() {
-        super();
+export default class ListReu extends Component {
+    constructor(props) {
+        super(props);
+        this.navigation= props.navigation
         this.firestoreRef = db.collection('reunion');
         this.state = {
           isLoading: true,
@@ -35,12 +37,12 @@ export default class ListReu extends React.Component {
       getCollection = (querySnapshot) => {
         const userArr = [];
         querySnapshot.forEach((res) => {
-          const { name, email, mobile, duree, salle , motif} = res.data();
+          const { nom, participant, mobile, duree, salle , motif} = res.data();
           userArr.push({
             key: res.id,
             res,
-            name,
-            email,
+            nom,
+            participant,
             mobile,
             duree,
             salle,
@@ -57,37 +59,48 @@ export default class ListReu extends React.Component {
           return(
             <View style={styles.preloader}>
               <ActivityIndicator size="large" color="#9E9E9E"/>
+              
             </View>
           )
         }    
+        
         return (
-          <ScrollView style={styles.container}>
+        
+            <React.Fragment>
+       <View style={styles.container}>
               {
                 this.state.userArr.map((item, i) => {
                   return (
+                    
                     <ListItem
                       key={i}
                       chevron
                       bottomDivider
-                      title={item.name}
-                      subtitle={item.email}
+                      title={item.nom}
+                      subtitle={item.partcipant}
                       onPress={() => {
                         this.props.navigation.navigate('ReunionDetail', {
                           userkey: item.key
                         });
                       }}/>
+                      
                   );
+                  
                 })
-              }
-               <FloatingAction
-                actions={actions}
-                onPressItem={name => {
-                    if(name == 'btn_add'){
-                        this.navigation.navigate('AddReu')
-                    }
-                    }}
-                />
-          </ScrollView>
+                
+              }  
+              
+          </View>
+          <FloatingAction
+            actions={actions}
+            onPressItem={name => {
+                if(name == 'btn_add'){
+                    this.navigation.navigate('AddReu')
+                }
+ 
+ }}
+ />
+          </React.Fragment>
           
         );
       }
@@ -97,7 +110,9 @@ export default class ListReu extends React.Component {
   const styles = StyleSheet.create({
     container: {
      flex: 1,
-     paddingBottom: 22
+     paddingBottom: 22,
+     backgroundColor: '#fff',
+    
     },
     preloader: {
       left: 0,
