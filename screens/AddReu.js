@@ -1,24 +1,30 @@
 import 'react-native-gesture-handler';
-
-import firebase from 'firebase';
-import React, { Component } from 'react';
-import { Button,StyleSheet,TextInput, Dimensions,ScrollView, ActivityIndicator, View } from 'react-native';
+import ReactChipInput from "react-chip-input";
+import RNPickerSelect from "react-native-picker-select";
+import db from '../database/firebaseDb';
+import React, { Component,Picker,state } from 'react';
+import { Button,StyleSheet,TextInput, Dimensions,ScrollView, ActivityIndicator, Image,View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
+
 export default class FormReu extends Component {
     constructor() {
         super();
-        this.dbRef = firebase.firestore().collection('reunion');
+        this.dbRef = db.collection('reunion');
         this.state = {
           nom: '',
           participant: '',
           mobile: '',
-          duree:'',
+          heure:'',
           salle:'',
           motif:'',
           isLoading: false
         };
+        this.state = {
+          chips: []
+        };
+       
       }
       inputValueUpdate = (val, prop) => {
         const state = this.state;
@@ -35,9 +41,9 @@ export default class FormReu extends Component {
           });      
           this.dbRef.add({
             nom: this.state.nom,
-            participant: this.state.participant,
+            chips: this.state.chips,
             mobile: this.state.mobile,
-            duree: this.state.duree,
+            heure: this.state.heure,
             salle: this.state.salle,
             motif: this.state.motif,
           }).then((res) => {
@@ -45,7 +51,7 @@ export default class FormReu extends Component {
               nom: '',
               participant: '',
               mobile: '',
-              duree:'',
+              heure:'',
               salle:'',
               motif:'',
               isLoading: false,
@@ -60,12 +66,23 @@ export default class FormReu extends Component {
           });
         }
       }
+      addChip = value => {
+        const chips = this.state.chips.slice();
+        chips.push(value);
+        this.setState({ chips });
+      };
+      removeChip = index => {
+        const chips = this.state.chips.slice();
+        chips.splice(index, 1);
+        this.setState({ chips });
+      };
     
  render (){
     if(this.state.isLoading){
         return(
           <View style={styles.preloader}>
             <ActivityIndicator size="large" color="#9E9E9E"/>
+            
           </View>
         )
       }
@@ -79,10 +96,8 @@ export default class FormReu extends Component {
             />
           </View>
           <View style={styles.inputGroup}>
-            <TextInput
-                multiline={true}
-                numberOfLines={4}
-                placeholder={'Email-participant'}
+          <TextInput
+                placeholder={'Participants'}
                 value={this.state.participant}
                 onChangeText={(val) => this.inputValueUpdate(val, 'participant')}
             />
@@ -96,20 +111,28 @@ export default class FormReu extends Component {
           </View>
           <View style={styles.inputGroup}>
             <TextInput
-                placeholder={'Durée de la réunion'}
-                value={this.state.duree}
-                onChangeText={(val) => this.inputValueUpdate(val, 'duree')}
+                placeholder={'Heure de la réunion'}
+                value={this.state.heure}
+                onChangeText={(val) => this.inputValueUpdate(val, 'heure')}
             />
           </View>
-          <View style={styles.inputGroup}>
-            <TextInput
-                placeholder={'Salle de la réunion'}
-                value={this.state.salle}
-                onChangeText={(val) => this.inputValueUpdate(val, 'salle')}
+             <RNPickerSelect
+             style={styles.inputGroup}
+                
+                onValueChange={(value) => this.inputValueUpdate(value, 'salle')}
+                items={[
+                  
+                    { label: "Room1", value: "Room1" },
+                    { label: "HA2", value: "HA2" },
+                    { label: "E26", value: "E26" },
+                    { label: "E24", value: "E24" },
+                    { label: "SES", value: "SES" },
+                    { label: "Mario", value: "Mario" },
+                ]}
             />
-          </View>
+         
           <View style={styles.inputGroup}>
-            <TextInput
+          <TextInput
                 placeholder={'Motif de la reunion'}
                 value={this.state.motif}
                 onChangeText={(val) => this.inputValueUpdate(val, 'motif')}
@@ -132,12 +155,14 @@ export default class FormReu extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 35
+    padding: 35,
+    
   },
   inputGroup: {
     flex: 1,
     padding: 0,
     marginBottom: 15,
+    borderRadius: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc',
   },
@@ -152,5 +177,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 7, 
-  }
+    borderRadius: 30,
+    
+  },
+  
 })
