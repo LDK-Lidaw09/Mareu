@@ -96,7 +96,7 @@ export default class DetailReu extends Component {
     });
   }
 
-   openTwoButtonAlert = () => {
+  openTwoButtonAlert = () => {
     alert(
       "Supprimer la réunion",
       "Êtes vous sur?",
@@ -112,9 +112,7 @@ export default class DetailReu extends Component {
         cancelable: true,
       }
     );
-  ;
-  }
-    
+  };
 
   render() {
     if (this.state.isLoading) {
